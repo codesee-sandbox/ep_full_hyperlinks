@@ -33,7 +33,7 @@ var collectContentPre = (hook, context)=>{
 exports.collectContentPre = collectContentPre;
 
 
-exports.generateLinkId = function(){
+exports.generateLinkId = ()=>{
    var linkId = "lc-" + randomString(16);
    return linkId;
 }

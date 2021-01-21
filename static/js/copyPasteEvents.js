@@ -2,10 +2,10 @@ var randomString = require('ep_etherpad-lite/static/js/pad_utils').randomString;
 var _ = require('ep_etherpad-lite/static/js/underscore');
 var shared = require('./shared');
 
-exports.addTextOnClipboard = function(e, ace, padInner, removeSelection, links, replies){
+exports.addTextOnClipboard = (e, ace, padInner, removeSelection, links, replies)=>{
   var linkIdOnFirstPositionSelected;
   var hasLinkOnSelection;
-  ace.callWithAce(function(ace) {
+  ace.callWithAce((ace) =>{
     linkIdOnFirstPositionSelected = ace.ace_getLinkIdOnFirstPositionSelected();
     hasLinkOnSelection = ace.ace_hasLinkOnSelection();
   });
@@ -44,17 +44,17 @@ exports.addTextOnClipboard = function(e, ace, padInner, removeSelection, links, 
   }
 };
 
-var getReplyData = function(replies, linkIds){
+var getReplyData = (replies, linkIds)=>{
   var replyData = {};
-  _.each(linkIds, function(linkId){
+  _.each(linkIds, (linkId)=>{
     replyData =  _.extend(getRepliesFromLinkId(replies, linkId), replyData);
   });
   return replyData;
 };
 
-var getRepliesFromLinkId = function(replies, linkId){
+var getRepliesFromLinkId = (replies, linkId)=>{
   var repliesFromLinkID = {};
-  _.each(replies, function(reply, replyId){
+  _.each(replies, (reply, replyId)=>{
     if(reply.linkId === linkId){
       repliesFromLinkID[replyId] = reply;
     }
@@ -62,28 +62,28 @@ var getRepliesFromLinkId = function(replies, linkId){
   return repliesFromLinkID;
 };
 
-var buildLinkIdToFakeIdMap = function(linksData){
+var buildLinkIdToFakeIdMap = (linksData)=>{
   var linkIdToFakeId = {};
-  _.each(linksData, function(link, fakeLinkId){
+  _.each(linksData, (link, fakeLinkId)=>{
     var linkId = link.data.originalLinkId;
     linkIdToFakeId[linkId] = fakeLinkId;
   });
   return linkIdToFakeId;
 };
 
-var replaceLinkIdsWithFakeIds = function(linksData, html){
+var replaceLinkIdsWithFakeIds = (linksData, html)=>{
   var linkIdToFakeId =  buildLinkIdToFakeIdMap(linksData);
-  _.each(linkIdToFakeId, function(fakeLinkId, linkId){
+  _.each(linkIdToFakeId, (fakeLinkId, linkId)=>{
     $(html).find("." + linkId).removeClass(linkId).addClass(fakeLinkId);
   });
   var htmlWithFakeLinkIds = getHtml(html);
   return htmlWithFakeLinkIds;
 };
 
-var buildLinksData = function(html, links){
+var buildLinksData = (html, links)=>{
   var linksData = {};
   var originalLinkIds = getLinkIds(html);
-  _.each(originalLinkIds, function(originalLinkId){
+  _.each(originalLinkIds, (originalLinkId)=>{
     var fakeLinkId = generateFakeLinkId();
     var link = links[originalLinkId];
     link.data.originalLinkId = originalLinkId;
@@ -92,15 +92,15 @@ var buildLinksData = function(html, links){
   return linksData;
 };
 
-var generateFakeLinkId = function(){
+var generateFakeLinkId = ()=>{
   var linkId = "fakelink-" + randomString(16);
   return linkId;
 };
 
-var getLinkIds = function(html){
+var getLinkIds = (html)=>{
   var allSpans = $(html).find("span");
   var linkIds = [];
-  _.each(allSpans, function(span){
+  _.each(allSpans, (span)=>{
     var cls = $(span).attr('class');
     var classLinkId = /(?:^| )(lc-[A-Za-z0-9]*)/.exec(cls);
     var linkId = (classLinkId) ? classLinkId[1] : false;
@@ -112,25 +112,25 @@ var getLinkIds = function(html){
   return uniqueLinkIds;
  };
 
-var createHiddenDiv = function(range){
+var createHiddenDiv = (range)=>{
   var content = range.cloneContents();
   var div = document.createElement("div");
   var hiddenDiv = $(div).html(content);
   return hiddenDiv;
 };
 
-var getHtml = function(hiddenDiv){
+var getHtml = (hiddenDiv)=>{
   return $(hiddenDiv).html();
 };
 
-var selectionHasOnlyText = function(rawHtml){
+var selectionHasOnlyText = (rawHtml)=>{
   var html = getHtml(rawHtml);
   var htmlDecoded = htmlDecode(html);
   var text = $(rawHtml).text();
   return htmlDecoded === text;
 };
 
-var buildHtmlToCopyWhenSelectionHasOnlyText = function(text, range, linkId) {
+var buildHtmlToCopyWhenSelectionHasOnlyText = (text, range, linkId)=> {
   var htmlWithSpans = buildHtmlWithTwoSpanTags(text, linkId);
   var html = buildHtmlWithFormattingTagsOfSelection(htmlWithSpans, range);
 
@@ -138,7 +138,7 @@ var buildHtmlToCopyWhenSelectionHasOnlyText = function(text, range, linkId) {
   return htmlToCopy;
 };
 
-var buildHtmlWithFormattingTagsOfSelection = function(html, range) {
+var buildHtmlWithFormattingTagsOfSelection = (html, range)=> {
   var htmlOfParentNode = range.commonAncestorContainer.parentNode;
   var tags = getTagsInSelection(htmlOfParentNode);
 
@@ -157,31 +157,31 @@ var buildHtmlWithFormattingTagsOfSelection = function(html, range) {
 // chrome keeps the background-color. To avoid this we create two spans. The first one, <span class='link c-124'>thi</span>
 // has the text until the last but one character and second one with the last character <span class='link c-124'>g</span>.
 // Etherpad does a good job joining the two spans into one after the paste is triggered.
-var buildHtmlWithTwoSpanTags = function(text, linkId) {
+var buildHtmlWithTwoSpanTags = (text, linkId) =>{
   var firstSpan = '<span class="link ' + linkId + '">'+ text.slice(0, -1) + '</span>'; // text until before last char
   var secondSpan = '<span class="link ' + linkId + '">'+ text.slice(-1) + '</span>'; // last char
 
   return firstSpan + secondSpan;
 }
 
-var buildOpenTags = function(tags){
+var buildOpenTags = (tags)=>{
   var openTags = "";
-  tags.forEach(function(tag){
+  tags.forEach((tag)=>{
     openTags += "<"+tag+">";
   });
   return openTags;
 };
 
-var buildCloseTags = function(tags){
+var buildCloseTags = (tags)=>{
   var closeTags = "";
   var tags = tags.reverse();
-  tags.forEach(function(tag){
+  tags.forEach((tag)=>{
     closeTags += "</"+tag+">";
   });
   return closeTags;
 };
 
-var getTagsInSelection = function(htmlObject){
+var getTagsInSelection = (htmlObject)=>{
   var tags = [];
   var tag;
   if($(htmlObject)[0].hasOwnProperty("localName")){
@@ -196,7 +196,7 @@ var getTagsInSelection = function(htmlObject){
   return tags;
 };
 
-exports.saveLinksAndReplies = function(e){
+exports.saveLinksAndReplies = (e)=>{
   var links = e.originalEvent.clipboardData.getData('text/objectLink');
   var replies = e.originalEvent.clipboardData.getData('text/objectReply');
   if(links && replies) {
@@ -207,14 +207,14 @@ exports.saveLinksAndReplies = function(e){
   }
 };
 
-var saveLinks = function(links){
+var saveLinks = (links)=>{
   var linksToSave = {};
   var padId = clientVars.padId;
 
   var mapOriginalLinksId = pad.plugins.ep_full_hyperlinks.mapOriginalLinksId;
   var mapFakeLinks = pad.plugins.ep_full_hyperlinks.mapFakeLinks;
 
-  _.each(links, function(link, fakeLinkId){
+  _.each(links, (link, fakeLinkId)=>{
     var linkData = buildLinkData(link, fakeLinkId);
     var newLinkId = shared.generateLinkId();
     mapFakeLinks[fakeLinkId] = newLinkId;
@@ -225,11 +225,11 @@ var saveLinks = function(links){
   pad.plugins.ep_full_hyperlinks.saveLinkWithoutSelection(padId, linksToSave);
 };
 
-var saveReplies = function(replies){
+var saveReplies = (replies)=>{
   var repliesToSave = {};
   var padId = clientVars.padId;
   var mapOriginalLinksId = pad.plugins.ep_full_hyperlinks.mapOriginalLinksId;
-  _.each(replies, function(reply, replyId){
+  _.each(replies, (reply, replyId)=>{
     var originalLinkId = reply.linkId;
     // as the link copied has got a new linkId, we set this id in the reply as well
     reply.linkId = mapOriginalLinksId[originalLinkId];
@@ -238,7 +238,7 @@ var saveReplies = function(replies){
   pad.plugins.ep_full_hyperlinks.saveLinkReplies(padId, repliesToSave);
 };
 
-var buildLinkData = function(link, fakeLinkId){
+var buildLinkData = (link, fakeLinkId)=>{
   var linkData = {};
   linkData.padId = clientVars.padId;
   linkData.link = link.data;
@@ -247,26 +247,26 @@ var buildLinkData = function(link, fakeLinkId){
 };
 
 // copied from https://css-tricks.com/snippets/javascript/unescape-html-in-js/
-var htmlDecode = function(input) {
+var htmlDecode = (input) =>{
   var e = document.createElement('div');
   e.innerHTML = input;
   return e.childNodes.length === 0 ? "" : e.childNodes[0].nodeValue;
 };
 
-// here we find the link id on a position [line, column]. This function is used to get the link id
+// here we find the link id on a position [line, column]. This  is used to get the link id
 // of one line when there is ONLY text selected. E.g In the line with link, <span class='link...'>something</span>,
 // and user copies the text 'omethin'. The span tags are not copied only the text. So as the link is
 // applied on the selection we get the linkId using the first position selected of the line.
 // P.S: It's not possible to have two or more links when there is only text selected, because for each link
 // created it's generated a <span> and to copy only the text it MUST NOT HAVE any tag on the selection
-exports.getLinkIdOnFirstPositionSelected = function() {
+exports.getLinkIdOnFirstPositionSelected = ()=> {
   var attributeManager = this.documentAttributeManager;
   var rep = this.rep;
   var linkId = _.object(attributeManager.getAttributesOnPosition(rep.selStart[0], rep.selStart[1])).link;
   return linkId;
 };
 
-exports.hasLinkOnSelection = function() {
+exports.hasLinkOnSelection = ()=> {
   var hasLink;
   var attributeManager = this.documentAttributeManager;
   var rep = this.rep;
@@ -284,7 +284,7 @@ exports.hasLinkOnSelection = function() {
   return hasLink;
 };
 
-var hasLinkOnMultipleLineSelection = function(firstLineOfSelection, lastLineOfSelection, rep, attributeManager){
+var hasLinkOnMultipleLineSelection = (firstLineOfSelection, lastLineOfSelection, rep, attributeManager)=>{
   var foundLineWithLink = false;
   for (var line = firstLineOfSelection; line <= lastLineOfSelection && !foundLineWithLink; line++) {
     var firstColumn = getFirstColumnOfSelection(line, rep, firstLineOfSelection);
@@ -297,11 +297,11 @@ var hasLinkOnMultipleLineSelection = function(firstLineOfSelection, lastLineOfSe
   return foundLineWithLink;
 }
 
-var getFirstColumnOfSelection = function(line, rep, firstLineOfSelection){
+var getFirstColumnOfSelection = (line, rep, firstLineOfSelection)=>{
   return line !== firstLineOfSelection ? 0 : rep.selStart[1];
 };
 
-var getLastColumnOfSelection = function(line, rep, lastLineOfSelection){
+var getLastColumnOfSelection = (line, rep, lastLineOfSelection)=>{
   var lastColumnOfSelection;
   if (line !== lastLineOfSelection) {
     lastColumnOfSelection = getLength(line, rep); // length of line
@@ -311,7 +311,7 @@ var getLastColumnOfSelection = function(line, rep, lastLineOfSelection){
   return lastColumnOfSelection;
 };
 
-var hasLinkOnLine = function(lineNumber, firstColumn, lastColumn, attributeManager){
+var hasLinkOnLine = (lineNumber, firstColumn, lastColumn, attributeManager)=>{
   var foundLinkOnLine = false;
   for (var column = firstColumn; column <= lastColumn && !foundLinkOnLine; column++) {
     var linkId = _.object(attributeManager.getAttributesOnPosition(lineNumber, column)).link;
@@ -322,11 +322,11 @@ var hasLinkOnLine = function(lineNumber, firstColumn, lastColumn, attributeManag
   return foundLinkOnLine;
 };
 
-var hasMultipleLineSelected = function(firstLineOfSelection, lastLineOfSelection){
+var hasMultipleLineSelected = (firstLineOfSelection, lastLineOfSelection)=>{
   return  firstLineOfSelection !== lastLineOfSelection;
 };
 
-var getLength = function(line, rep) {
+var getLength = (line, rep)=> {
   var nextLine = line + 1;
   var startLineOffset = rep.lines.offsetOfIndex(line);
   var endLineOffset   = rep.lines.offsetOfIndex(nextLine);

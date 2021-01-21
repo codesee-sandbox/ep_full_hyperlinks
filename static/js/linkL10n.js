@@ -1,6 +1,6 @@
 /* ***** Public methods: ***** */
 
-var localize = function(element) {
+var localize = (element)=> {
     html10n.translateElement(html10n.translations, element.get(0));
   };
   

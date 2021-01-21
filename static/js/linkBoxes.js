@@ -1,24 +1,24 @@
 // Easier access to outter pad
 var padOuter;
-var getPadOuter = function() {
+var getPadOuter = ()=> {
   padOuter = padOuter || $('iframe[name="ace_outer"]').contents();
   return padOuter;
 }
 
-var getLinksContainer = function() {
+var getLinksContainer = ()=> {
   return getPadOuter().find("#links");
 }
 
 /* ***** Public methods: ***** */
 
-var showLink = function(linkId, e) {
+var showLink = (linkId, e)=> {
   var linkElm = getLinksContainer().find('#'+ linkId);
   linkElm.show();
 
   highlightLink(linkId, e);
 };
 
-var hideLink = function(linkId, hideLinkTitle) {
+var hideLink = (linkId, hideLinkTitle)=> {
   var linkElm = getLinksContainer().find('#'+ linkId);
   if (linkElm.hasClass("hyperlink-display") ){
     //linkElm.css({top:  parseInt(linkElm.css("top").split('px')[0]) - 35 + "px"  })
@@ -39,13 +39,13 @@ var hideLink = function(linkId, hideLinkTitle) {
   getPadOuter().find('.link-modal').removeClass('popup-show');
 };
 
-var hideAllLinks = function() {
+var hideAllLinks = ()=> {
   // getLinksContainer().find('.sidebar-link').removeClass('full-display');
   // getPadOuter().find('.link-modal').removeClass('popup-show');
   var container       = getLinksContainer();
   var inner = $('iframe[name="ace_outer"]').contents().find('iframe[name="ace_inner"]');
 
-  container.find('.sidebar-link').each(function() {
+  container.find('.sidebar-link').each(()=> {
     inner.contents().find("head .link-style").remove();
     if ($(this).hasClass("hyperlink-display")){
       $(this).removeClass('hyperlink-display')
@@ -60,14 +60,17 @@ var hideAllLinks = function() {
   });
 }
 
-var highlightLink = function(linkId, e, editorLink,socket,padId){
+var highlightLink = (linkId, e, editorLink,socket,padId)=>{
+  console.log(linkId, e, editorLink,socket,padId)
   var container       = getLinksContainer();
   var linkElm      = container.find('#'+ linkId);
-  var inner = $('iframe[name="ace_outer"]').contents().find('iframe[name="ace_inner"]');
+  if(linkElm.length == 0)
+    return false;
 
+  var inner = $('iframe[name="ace_outer"]').contents().find('iframe[name="ace_inner"]');
   if (container.is(":visible")) {
     // hide all other links
-    container.find('.sidebar-link').each(function() {
+    container.find('.sidebar-link').each(()=> {
       inner.contents().find("head .link-style").remove();
       if ($(this).attr("data-linkid") != linkId){
         if ($(this).hasClass("hyperlink-display") ){
@@ -91,11 +94,13 @@ var highlightLink = function(linkId, e, editorLink,socket,padId){
 
     if (!linkElm.hasClass("hyperlink-display")){
       linkElm.css({"width":"324px"}) // because of need to determine exact size for putting best area
-
+      console.log(linkElm.css("width"),"linkElm.css()")
+      var currentWidth = linkElm.css("width").split('px')[0] || 0;
+      var currentTop = linkElm.css("top").split('px')[0] || 0
       var loaded= linkElm.attr("data-loaded")
       if(loaded){
-        linkElm.css({"left":parseInt(editorLink.position().left) +parseInt(linkElm.css("width").split('px')[0]) + "px"   })
-        linkElm.css({top:  parseInt(linkElm.css("top").split('px')[0]) + 35 + "px"  })
+        linkElm.css({"left":parseInt(editorLink.position().left) +parseInt(currentWidth) + "px"   })
+        linkElm.css({top:  parseInt(currentTop) + 35 + "px"  })
         linkElm.addClass('hyperlink-display');
 
       }else{
@@ -114,9 +119,8 @@ var highlightLink = function(linkId, e, editorLink,socket,padId){
 
 
 
-
-        linkElm.css({"left":parseInt(editorLink.position().left) +parseInt(linkElm.css("width").split('px')[0]) + "px"   })
-        linkElm.css({top:  parseInt(linkElm.css("top").split('px')[0]) + 35 + "px"  })
+        linkElm.css({"left":parseInt(editorLink.position().left) + parseInt(currentWidth)+ "px"   })
+        linkElm.css({top:  parseInt(currentTop) + 35 + "px"  })
         linkElm.addClass('hyperlink-display');
         //raise for og:title resolving
 
@@ -126,13 +130,13 @@ var highlightLink = function(linkId, e, editorLink,socket,padId){
         }
 
         //........
-        const metaResolverCallBack = function (result){
+        const metaResolverCallBack =  (result)=>{
           ep_hyperlink_title.attr('href',hyperlink);
 
           if(result.metadata.image && result.metadata.title){
             ep_hyperlink_img.attr('src',result.metadata.image);  
-            ep_hyperlink_img.on("load",function(){
-              card_loading_hyperlink.fadeOut(500,function(){
+            ep_hyperlink_img.on("load",()=>{
+              card_loading_hyperlink.fadeOut(500,()=>{
                 ep_hyperlink_img.fadeIn()
                 ep_hyperlink_title.text(result.metadata.title)
                 ep_hyperlink_description.text(result.metadata.url.replace(/^(?:https?:\/\/)?(?:www\.)?/i, "").split('/')[0])
@@ -146,8 +150,8 @@ var highlightLink = function(linkId, e, editorLink,socket,padId){
               socket.emit('metaResolver', {padId: padId,hyperlink : hyperlink,last:true}, metaResolverCallBack);
             }else{
               ep_hyperlink_img.attr('src',"../static/plugins/ep_full_hyperlinks/static/img/nometa.png");  
-              ep_hyperlink_img.on("load",function(){
-                card_loading_hyperlink.fadeOut(500,function(){
+              ep_hyperlink_img.on("load",()=>{
+                card_loading_hyperlink.fadeOut(500,()=>{
                   ep_hyperlink_img.fadeIn()
                   ep_hyperlink_description.text(hyperlink.replace(/^(?:https?:\/\/)?(?:www\.)?/i, "").split('/')[0])
                   linkElm.attr({"data-loaded":true})
@@ -170,7 +174,7 @@ var highlightLink = function(linkId, e, editorLink,socket,padId){
           //   }
           //   else {
           //     if (res.images){
-          //       $.each(res.images,function(key,value){
+          //       $.each(res.images,(key,value){
           //         if(isUrlValid(value) && notInTheseUrls(value)){
           //           image = value;
           //           return false;
@@ -196,9 +200,9 @@ var highlightLink = function(linkId, e, editorLink,socket,padId){
           //     }
           //   }
     
-          //   ep_hyperlink_img.on("load",function(){
+          //   ep_hyperlink_img.on("load",(){
               
-          //     card_loading_hyperlink.fadeOut(500,function(){
+          //     card_loading_hyperlink.fadeOut(500,(){
           //       ep_hyperlink_img.fadeIn()
           //       ep_hyperlink_title.text(res.title)
           //       ep_hyperlink_description.text(res.url.replace(/^(?:https?:\/\/)?(?:www\.)?/i, "").split('/')[0])
@@ -248,7 +252,7 @@ var highlightLink = function(linkId, e, editorLink,socket,padId){
     // before of appending clear the css (like top positionning)
     linkElmCloned.attr('style', '');
     // fix checkbox, because as we are duplicating the sidebar-link, we lose unique input names
-    linkElmCloned.find('.label-suggestion-checkbox').click(function() {
+    linkElmCloned.find('.label-suggestion-checkbox').click(()=> {
       $(this).siblings('input[type="checkbox"]').click();
     })
 
@@ -284,7 +288,7 @@ var highlightLink = function(linkId, e, editorLink,socket,padId){
 
 // Adjust position of the link detail on the container, to be on the same
 // height of the pad text associated to the link, and return the affected element
-var adjustTopOf = function(linkId, baseTop) {
+var adjustTopOf = (linkId, baseTop)=> {
   var linkElement = getPadOuter().find('#'+linkId);
   linkElement.css("top", baseTop+"px");
   linkElement.attr("data-basetop", baseTop);
@@ -293,23 +297,23 @@ var adjustTopOf = function(linkId, baseTop) {
 }
 
 // Indicates if link is on the expected position (baseTop-5)
-var isOnTop = function(linkId, baseTop) {
+var isOnTop = (linkId, baseTop)=> {
   var linkElement = getPadOuter().find('#'+linkId);
   var expectedTop = baseTop + "px";
   return linkElement.css("top") === expectedTop;
 }
 
-var isUrlValid = function(url) {
+var isUrlValid = (url)=> {
   return /^(https?|s?ftp):\/\/(((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:)*@)?(((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5]))|((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?)(:\d*)?)(\/((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)?)?(\?((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|[\uE000-\uF8FF]|\/|\?)*)?(#((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|\/|\?)*)?$/i.test(url);
 }
-var notInTheseUrls  = function(url) {
+var notInTheseUrls  = (url)=> {
   if(url == "https://www.google.com/tia/tia.png")
     return false ;
   return true
 }
 
 // Indicates if event was on one of the elements that does not close link
-var shouldNotCloseLink = function(e) {
+var shouldNotCloseLink = (e)=> {
   // a link box
   if ($(e.target).closest('.link').length || $(e.target).closest('.link-modal').length
   || $(e.target).closest('.ep_hyperlink_docs_bubble_button_edit').length ||  $(e.target).closest('.ep_hyperlink_docs_bubble_button_delete').length ||

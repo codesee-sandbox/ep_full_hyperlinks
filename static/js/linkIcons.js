@@ -3,25 +3,25 @@ var _ = require('ep_etherpad-lite/static/js/underscore');
 var linkBoxes = require('ep_full_hyperlinks/static/js/linkBoxes');
 
 // Indicates if Etherpad is configured to display icons
-var displayIcons = function() {
+var displayIcons = ()=> {
   return clientVars.displayLinkAsIcon
 }
 
 // Easier access to outer pad
 var padOuter;
-var getPadOuter = function() {
+var getPadOuter = ()=> {
   padOuter = padOuter || $('iframe[name="ace_outer"]').contents();
   return padOuter;
 }
 
 // Easier access to inner pad
 var padInner;
-var getPadInner = function() {
+var getPadInner = ()=> {
   padInner = padInner || getPadOuter().find('iframe[name="ace_inner"]').contents();
   return padInner;
 }
 
-var getOrCreateIconsContainerAt = function(top) {
+var getOrCreateIconsContainerAt = (top)=> {
   var iconContainer = getPadOuter().find('#linkIcons');
   var iconClass = "icon-at-"+top;
 
@@ -39,36 +39,36 @@ var getOrCreateIconsContainerAt = function(top) {
   return iconsAtLine;
 }
 
-var targetLinkIdOf = function(e) {
+var targetLinkIdOf = (e)=> {
   return e.currentTarget.getAttribute("data-linkid");
 }
 
-var highlightTargetTextOf = function(linkId) {
+var highlightTargetTextOf = (linkId)=> {
   getPadInner().find("head").append("<style class='link-style'>."+linkId+"{ color: #a7680c !important }</style>");
 }
 
-var removeHighlightTargetText = function(linkId) {
+var removeHighlightTargetText = (linkId)=> {
   getPadInner().find("head .link-style").remove();
 }
 
-var toggleActiveLinkIcon = function(target) {
+var toggleActiveLinkIcon = (target)=> {
   target.toggleClass("active").toggleClass("inactive");
 }
 
-var addListenersToLinkIcons = function() {
-  getPadOuter().find('#linkIcons').on("mouseover", ".link-icon", function(e){
+var addListenersToLinkIcons = ()=> {
+  getPadOuter().find('#linkIcons').on("mouseover", ".link-icon", (e)=>{
     removeHighlightTargetText();
     var linkId = targetLinkIdOf(e);
     highlightTargetTextOf(linkId);
-  }).on("mouseout", ".link-icon", function(e){
+  }).on("mouseout", ".link-icon", (e)=>{
     var linkId = targetLinkIdOf(e);
     removeHighlightTargetText();
-  }).on("click", ".link-icon.active", function(e){
+  }).on("click", ".link-icon.active", (e)=>{
     toggleActiveLinkIcon($(this));
 
     var linkId = targetLinkIdOf(e);
     linkBoxes.hideLink(linkId, true);
-  }).on("click", ".link-icon.inactive", function(e){
+  }).on("click", ".link-icon.inactive", (e)=>{
     // deactivate/hide other link boxes that are opened, so we have only
     // one link box opened at a time
     linkBoxes.hideAllLinks();
@@ -84,21 +84,21 @@ var addListenersToLinkIcons = function() {
 
 // Listen to clicks on the page to be able to close link when clicking
 // outside of it
-var addListenersToCloseOpenedLink = function() {
+var addListenersToCloseOpenedLink = ()=> {
   // we need to add listeners to the different iframes of the page
-  $(document).on("touchstart click", function(e){
+  $(document).on("touchstart click", (e)=>{
     closeOpenedLinkIfNotOnSelectedElements(e);
   });
-  getPadOuter().find('html').on("touchstart click", function(e){
+  getPadOuter().find('html').on("touchstart click", (e)=>{
     closeOpenedLinkIfNotOnSelectedElements(e);
   });
-  getPadInner().find('html').on("touchstart click", function(e){
+  getPadInner().find('html').on("touchstart click", (e)=>{
     closeOpenedLinkIfNotOnSelectedElements(e);
   });
 }
 
 // Close link if event target was outside of link or on a link icon
-var closeOpenedLinkIfNotOnSelectedElements = function(e) {
+var closeOpenedLinkIfNotOnSelectedElements = (e)=> {
   // Don't do anything if clicked on the following elements:
   // any of the link icons
   if (shouldNotCloseLink(e) || linkBoxes.shouldNotCloseLink(e)) { // a link box or the link modal
@@ -116,14 +116,14 @@ var closeOpenedLinkIfNotOnSelectedElements = function(e) {
 }
 
 // Search on the page for an opened link
-var findOpenedLink = function() {
+var findOpenedLink = ()=> {
   return getPadOuter().find('#linkIcons .link-icon.active').get(0);
 }
 
 /* ***** Public methods: ***** */
 
 // Create container to hold link icons
-var insertContainer = function() {
+var insertContainer = ()=> {
   // we're only doing something if icons will be displayed at all
   if (!displayIcons()) return;
 
@@ -134,7 +134,7 @@ var insertContainer = function() {
 }
 
 // Create a new link icon
-var addIcon = function(linkId, link){
+var addIcon = (linkId, link)=>{
   // we're only doing something if icons will be displayed at all
   if (!displayIcons()) return;
 
@@ -147,18 +147,18 @@ var addIcon = function(linkId, link){
 }
 
 // Hide link icons from container
-var hideIcons = function() {
+var hideIcons = ()=> {
   // we're only doing something if icons will be displayed at all
   if (!displayIcons()) return;
 
-  getPadOuter().find('#linkIcons').children().children().each(function(){
+  getPadOuter().find('#linkIcons').children().children().each((){
     $(this).hide();
   });
 }
 
 // Adjust position of the link icon on the container, to be on the same
 // height of the pad text associated to the link, and return the affected icon
-var adjustTopOf = function(linkId, baseTop) {
+var adjustTopOf = (linkId, baseTop)=> {
   // we're only doing something if icons will be displayed at all
   if (!displayIcons()) return;
 
@@ -176,7 +176,7 @@ var adjustTopOf = function(linkId, baseTop) {
 
 // Indicate if link detail currently opened was shown by a click on
 // link icon.
-var isLinkOpenedByClickOnIcon = function() {
+var isLinkOpenedByClickOnIcon = ()=> {
   // we're only doing something if icons will be displayed at all
   if (!displayIcons()) return false;
 
@@ -188,7 +188,7 @@ var isLinkOpenedByClickOnIcon = function() {
 
 // Mark link as a link-with-reply, so it can be displayed with a
 // different icon
-var linkHasReply = function(linkId) {
+var linkHasReply = (linkId)=> {
   // we're only doing something if icons will be displayed at all
   if (!displayIcons()) return;
 
@@ -199,7 +199,7 @@ var linkHasReply = function(linkId) {
 
 // Indicate if sidebar link should be shown, checking if it had the characteristics
 // of a link that was being displayed on the screen
-var shouldShow = function(sidebarComent) {
+var shouldShow = (sidebarComent)=> {
   var shouldShowLink = false;
 
   if (!displayIcons()) {
@@ -214,7 +214,7 @@ var shouldShow = function(sidebarComent) {
 }
 
 // Indicates if event was on one of the elements that does not close link (any of the link icons)
-var shouldNotCloseLink = function(e) {
+var shouldNotCloseLink = (e)=> {
   return $(e.target).closest('.link-icon').length !== 0;
 }
 

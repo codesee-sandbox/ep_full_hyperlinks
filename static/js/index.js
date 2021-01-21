@@ -1334,10 +1334,10 @@ ep_links.prototype.pushLink = function(eventType, callback){
 /*                           Etherpad Hooks                             */
 /************************************************************************/
 
-var hooks = {
+const hooks = {
 
   // Init pad links
-  postAceInit: (hook, context)=>{
+  postAceInit: (hook, context,cb) => {
     if(!pad.plugins) pad.plugins = {};
     var Links = new ep_links(context);
     pad.plugins.ep_full_hyperlinks = Links;
@@ -1350,7 +1350,7 @@ var hooks = {
         class_name: "error"
       })
     }
-    return[];
+    return cb();
   },
 
   aceEditEvent: (hook, context)=>{
@@ -1507,10 +1507,11 @@ function getRepFromSelector(selector, container){
   return repArr;
 }
 // Once ace is initialized, we set ace_doInsertHeading and bind it to the context
-exports.aceInitialized = function(hook, context){
+exports.aceInitialized = (hook, context)=>{
   var editorInfo = context.editorInfo;
   editorInfo.ace_getRepFromSelector = _(getRepFromSelector).bind(context);
   editorInfo.ace_getLinkIdOnFirstPositionSelected = _(getLinkIdOnFirstPositionSelected).bind(context);
   editorInfo.ace_hasLinkOnSelection = _(hasLinkOnSelection).bind(context);
+  return [];
 }
 

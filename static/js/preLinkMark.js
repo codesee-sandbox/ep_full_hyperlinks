@@ -2,7 +2,7 @@ var $ = require('ep_etherpad-lite/static/js/rjquery').$;
 
 exports.MARK_CLASS = 'pre-selected-link';
 
-var preLinkMarker = function(ace) {
+var preLinkMarker = (ace)=> {
   this.ace = ace;
   var self = this;
 
@@ -12,37 +12,37 @@ var preLinkMarker = function(ace) {
   // remove any existing marks, as there is no link being added on plugin initialization
   // (we need the timeout to let the plugin be fully initialized before starting to remove
   // marked texts)
-  setTimeout(function() {
+  setTimeout(()=> {
     self.unmarkSelectedText();
   }, 0);
 }
 
 // Indicates if Etherpad is configured to highlight text
-preLinkMarker.prototype.highlightSelectedText = function() {
+preLinkMarker.prototype.highlightSelectedText = ()=> {
   return clientVars.highlightSelectedText;
 }
 
-preLinkMarker.prototype.markSelectedText = function() {
+preLinkMarker.prototype.markSelectedText = ()=> {
   // do nothing if this feature is not enabled
   if (!this.highlightSelectedText()) return;
 
   this.ace.callWithAce(doNothing, 'markPreSelectedTextToLink', true);
 }
 
-preLinkMarker.prototype.unmarkSelectedText = function() {
+preLinkMarker.prototype.unmarkSelectedText = ()=> {
   // do nothing if this feature is not enabled
   if (!this.highlightSelectedText()) return;
 
   this.ace.callWithAce(doNothing, 'unmarkPreSelectedTextToLink', true);
 }
 
-preLinkMarker.prototype.performNonUnduableEvent = function(eventType, callstack, action) {
+preLinkMarker.prototype.performNonUnduableEvent = (eventType, callstack, action)=> {
   callstack.startNewEvent("nonundoable");
   action();
   callstack.startNewEvent(eventType);
 }
 
-preLinkMarker.prototype.handleMarkText = function(context) {
+preLinkMarker.prototype.handleMarkText = (context)=> {
   var editorInfo = context.editorInfo;
   var rep        = context.rep;
   var callstack  = context.callstack;
@@ -53,7 +53,7 @@ preLinkMarker.prototype.handleMarkText = function(context) {
   this.addMark(editorInfo, callstack);
 }
 
-preLinkMarker.prototype.handleUnmarkText = function(context) {
+preLinkMarker.prototype.handleUnmarkText = (context)=> {
   var editorInfo = context.editorInfo;
   var rep        = context.rep;
   var callstack  = context.callstack;
@@ -61,28 +61,28 @@ preLinkMarker.prototype.handleUnmarkText = function(context) {
   this.removeMarks(editorInfo, rep, callstack);
 }
 
-preLinkMarker.prototype.addMark = function(editorInfo, callstack) {
+preLinkMarker.prototype.addMark = (editorInfo, callstack)=> {
   var eventType  = callstack.editEvent.eventType;
 
   // we don't want the text marking to be undoable
-  this.performNonUnduableEvent(eventType, callstack, function() {
+  this.performNonUnduableEvent(eventType, callstack, ()=> {
     editorInfo.ace_setAttributeOnSelection(exports.MARK_CLASS, clientVars.userId);
   });
 }
 
-preLinkMarker.prototype.removeMarks = function(editorInfo, rep, callstack) {
+preLinkMarker.prototype.removeMarks = (editorInfo, rep, callstack)=> {
   var eventType        = callstack.editEvent.eventType;
   var originalSelStart = rep.selStart;
   var originalSelEnd   = rep.selEnd;
 
   // we don't want the text marking to be undoable
-  this.performNonUnduableEvent(eventType, callstack, function() {
+  this.performNonUnduableEvent(eventType, callstack, ()=> {
     // remove marked text
     var padInner = $('iframe[name="ace_outer"]').contents().find('iframe[name="ace_inner"]');
     var selector = "." + exports.MARK_CLASS;
     var repArr = editorInfo.ace_getRepFromSelector(selector, padInner);
     // repArr is an array of reps
-    $.each(repArr, function(index, rep){
+    $.each(repArr, (index, rep)=>{
       editorInfo.ace_performSelectionChange(rep[0], rep[1], true);
       editorInfo.ace_setAttributeOnSelection(exports.MARK_CLASS, false);
     });
@@ -93,8 +93,8 @@ preLinkMarker.prototype.removeMarks = function(editorInfo, rep, callstack) {
 }
 
 // we do nothing on callWithAce; actions will be handled on aceEditEvent
-var doNothing = function() {}
+var doNothing = ()=>{}
 
-exports.init = function(ace) {
+exports.init = (ace)=> {
   return new preLinkMarker(ace);
 }

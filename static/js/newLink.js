@@ -2,7 +2,7 @@ var $ = require('ep_etherpad-lite/static/js/rjquery').$;
 var linkL10n = require('ep_full_hyperlinks/static/js/linkL10n');
 
 // Create a link object with data filled on the given form
-var buildLinkFrom = function(form) {
+var buildLinkFrom = (form)=> {
   var text       = form.find('#hyperlink-text').val();
   var oldText       = form.find('#hyperlink-text-hidden').val();
   var hyperlink       = form.find('#hyperlink-url').val();
@@ -24,12 +24,12 @@ var buildLinkFrom = function(form) {
 }
 
 // Callback for new link Cancel
-var cancelNewLink = function(){
+var cancelNewLink = ()=>{
   hideNewLinkPopup();
 }
 
 // Callback for new link Submit
-var submitNewLink = function(callback) {
+var submitNewLink = (callback)=> {
   var index = 0;
   var form = $('#newLink');
   var link = buildLinkFrom(form);
@@ -48,13 +48,13 @@ var submitNewLink = function(callback) {
 
 /* ***** Public methods: ***** */
 
-var localizenewLinkPopup = function() {
+var localizenewLinkPopup = ()=> {
   var newLinkPopup = $('#newLink');
   if (newLinkPopup.length !== 0) linkL10n.localize(newLinkPopup);
 };
 
 // Insert new Link Form
-var insertNewLinkPopupIfDontExist = function(link, callback) {
+var insertNewLinkPopupIfDontExist = (link, callback)=> {
   $('#newLink').remove();
   var newLinkPopup = $('#newLink');
 
@@ -65,16 +65,16 @@ var insertNewLinkPopupIfDontExist = function(link, callback) {
   localizenewLinkPopup();
 
   // Listen for include suggested change toggle
-  $('#newLink').find('.suggestion-checkbox').change(function() {
+  $('#newLink').find('.suggestion-checkbox').change(()=> {
     $('#newLink').find('.suggestion').toggle($(this).is(':checked'));
   });
 
   // Cancel btn
-  newLinkPopup.find('#link-reset').on('click', function() {
+  newLinkPopup.find('#link-reset').on('click', ()=> {
     cancelNewLink();
   });
   // Create btn // link-create-btn
-  $('#newLink').on("submit", function(e) {
+  $('#newLink').on("submit", (e)=> {
     e.preventDefault();
     return submitNewLink(callback);
   });
@@ -82,7 +82,7 @@ var insertNewLinkPopupIfDontExist = function(link, callback) {
   return newLinkPopup;
 };
 
-var showNewLinkPopup = function() {
+var showNewLinkPopup = ()=> {
   // position below link icon
   $('#newLink').css('left', $('.toolbar .addLink').offset().left)
 
@@ -101,12 +101,12 @@ var showNewLinkPopup = function() {
   //focus on hyperlink input
   
 
-  setTimeout(function() {$('#newLink').find('.link-content').focus().select(); }, 500);
+  setTimeout(()=> {$('#newLink').find('.link-content').focus().select(); }, 500);
 
   
 }
 
-var hideNewLinkPopup = function() {
+var hideNewLinkPopup = ()=> {
   $('#newLink').removeClass("popup-show");
 
   // force focus to be lost, so virtual keyboard is hidden on mobile devices
