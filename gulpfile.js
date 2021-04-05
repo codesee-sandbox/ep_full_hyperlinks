@@ -21,6 +21,17 @@ const jsfiles = {
   shared: './static/js/shared.js',
 };
 
+const codeseeJSfiles = {
+  events: './codesee/js/copyPasteEvents.js',
+  linkBoxes: './codesee/js/linkBoxes.js',
+  linkIcons: './codesee/js/linkIcons.js',
+  linkL10n: './codesee/js/linkL10n.js',
+  newLink: './codesee/js/newLink.js',
+  preLinkMark: './codesee/js/preLinkMark.js',
+  timeFormat: './codesee/js/timeFormat.js',
+  shared: './codesee/js/shared.js',
+};
+
 const jsPlugins = []
 
 const etherpadModule = [`
@@ -33,11 +44,11 @@ const imageFiles = ['./static/img/*']
 
 const gulpifyJs = () => gulp.src([
 		...jsPlugins,
-		...Object.entries(jsfiles).map((x) => x[1])
+		...Object.entries(codeseeJSfiles).map((x) => x[1])
 	]).pipe(mode.production(sourcemaps.init()))
 		.pipe(concat('ep.full.hyperlinks.mini.js'))
 		.pipe(inject.prepend(`${etherpadModule} \n`))
-    .pipe(inject.append(`return {\n${Object.entries(jsfiles).map((x) => `${x[0]}\n`)}}\n`))
+    .pipe(inject.append(`return {\n${Object.entries(codeseeJSfiles).map((x) => `${x[0]}\n`)}}\n`))
     .pipe(inject.wrap('exports.moduleList = (()=>{\n', '})();'))
     .pipe(mode.production(uglify(/* options */)))
     .pipe(mode.production(sourcemaps.write('.')))
@@ -75,12 +86,19 @@ gulp.task('git:push', (cb) => {
   });
 });
 
-gulp.task('default', () =>
-	gulp.src('src/app.js')
+gulp.task('babelify', () =>
+	gulp.src(jsfiles)
 		.pipe(babel({
-			presets: ['@babel/preset-env']
+			presets: ['@babel/preset-env'],
+			"env": {
+				"development": {
+					"plugins": [
+						["@codesee/instrument", { hosted: true }]
+					],
+				}
+			}
 		}))
-		.pipe(gulp.dest('dist'))
+		.pipe(gulp.dest('codesee'))
 );
 
 gulp.task('watch', () => {
@@ -91,4 +109,4 @@ gulp.task('watch', () => {
   gulp.watch(watchFiles, gulp.series(['js', 'minify-css']));
 });
 
-gulp.task('build', gulp.series(['js','minify-css', 'minify-image', 'bump', 'git:publish', 'git:push']));
+gulp.task('build', gulp.series(['babelify', 'js','minify-css', 'minify-image', 'bump', 'git:publish', 'git:push']));
