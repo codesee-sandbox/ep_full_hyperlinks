@@ -55,6 +55,8 @@
   "devDependencies": {
     "@babel/core": "^7.13.14",
     "@babel/preset-env": "^7.13.12",
+    "@codesee/babel-plugin-instrument": "^0.19.0",
+    "@codesee/tracker": "^0.19.0",
     "eslint": "^7.18.0",
     "eslint-config-etherpad": "^1.0.23",
     "eslint-plugin-mocha": "^8.0.0",
