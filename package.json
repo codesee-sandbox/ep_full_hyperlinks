@@ -53,6 +53,8 @@
   },
   "homepage": "https://github.com/samirsayyad/ep_full_hyperlinks#readme",
   "devDependencies": {
+    "@babel/core": "^7.13.14",
+    "@babel/preset-env": "^7.13.12",
     "eslint": "^7.18.0",
     "eslint-config-etherpad": "^1.0.23",
     "eslint-plugin-mocha": "^8.0.0",
@@ -60,6 +62,7 @@
     "eslint-plugin-prefer-arrow": "^1.2.3",
     "eslint-plugin-promise": "^4.2.1",
     "gulp": "^4.0.2",
+    "gulp-babel": "^8.0.0",
     "gulp-bump": "^3.2.0",
     "gulp-clean-css": "^4.3.0",
     "gulp-concat": "^2.6.1",
