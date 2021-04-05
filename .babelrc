@@ -1,0 +1,13 @@
+{
+  "presets": [
+  ],
+  "env": {
+    "development": {
+      "plugins": [
+        ["@codesee/instrument", {hosted: true}]
+      ],
+    }
+  }
+}
+
+
