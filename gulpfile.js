@@ -1,4 +1,5 @@
 const gulp = require('gulp');
+const babel = require('gulp-babel');
 const concat = require('gulp-concat');
 const inject = require('gulp-inject-string');
 const uglify = require('gulp-uglify-es').default;
@@ -73,6 +74,14 @@ gulp.task('git:push', (cb) => {
     cb();
   });
 });
+
+gulp.task('default', () =>
+	gulp.src('src/app.js')
+		.pipe(babel({
+			presets: ['@babel/preset-env']
+		}))
+		.pipe(gulp.dest('dist'))
+);
 
 gulp.task('watch', () => {
 	const watchFiles = [
